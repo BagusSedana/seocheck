@@ -16,17 +16,13 @@ if not SECRET_KEY:
 ALGORITHM   = "HS256"
 EXPIRE_MIN  = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "10080"))
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
 bearer      = HTTPBearer(auto_error=False)
 
 def hash_password(password: str) -> str:
-    # bcrypt max 72 bytes, truncate at 71 to be safe
-    password = password[:71]
     return pwd_context.hash(password)
 
 def verify_password(plain: str, hashed: str) -> bool:
-    # bcrypt max 72 bytes, truncate at 71 to be safe
-    plain = plain[:71]
     return pwd_context.verify(plain, hashed)
 
 def create_token(data: dict) -> str:
