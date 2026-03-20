@@ -160,13 +160,22 @@ async def google_login(request: Request, body: GoogleAuthSchema, db: Session = D
     import secrets
     import os
     
-    CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "717904791336-qj6g02f8jngc2uolvlsst94tll18o4v6.apps.googleusercontent.com")
     try:
-        idinfo = id_token.verify_oauth2_token(body.token, google_requests.Request(), CLIENT_ID)
-        email = idinfo['email']
-        name = idinfo.get('name', 'Google User')
+        CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "717904791336-qj6g02f8jngc2uolvlsst94tll18o4v6.apps.googleusercontent.com")
+        try:
+            idinfo = id_token.verify_oauth2_token(body.token, google_requests.Request(), CLIENT_ID)
+            email = idinfo['email']
+            name = idinfo.get('name', 'Google User')
+        except Exception as e:
+            print(f"ERROR Google Token Verification: {str(e)}")
+            raise HTTPException(401, f"Token Google tidak valid: {str(e)}")
+    except HTTPException:
+        raise
     except Exception as e:
-        raise HTTPException(401, f"Token Google tidak valid: {str(e)}")
+        import traceback
+        print(f"CRITICAL ERROR in google_login: {str(e)}")
+        print(traceback.format_exc())
+        raise HTTPException(500, f"Internal server error: {str(e)}")
         
     user = db.query(models.User).filter(models.User.email == email).first()
     if not user:
