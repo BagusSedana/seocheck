@@ -20,13 +20,13 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 bearer      = HTTPBearer(auto_error=False)
 
 def hash_password(password: str) -> str:
-    # bcrypt max 72 bytes
-    password = password[:72]
+    # bcrypt max 72 bytes, truncate at 71 to be safe
+    password = password[:71]
     return pwd_context.hash(password)
 
 def verify_password(plain: str, hashed: str) -> bool:
-    # bcrypt max 72 bytes
-    plain = plain[:72]
+    # bcrypt max 72 bytes, truncate at 71 to be safe
+    plain = plain[:71]
     return pwd_context.verify(plain, hashed)
 
 def create_token(data: dict) -> str:
