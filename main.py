@@ -1,7 +1,10 @@
 import sys, os, asyncio
 from datetime import datetime, timedelta
-from dotenv import load_dotenv
-load_dotenv()
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
