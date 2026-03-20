@@ -2,7 +2,9 @@
 __pycache__/
 *.db
 *.log
-*.txt
+error.log
+migration_error.txt
+test_output.txt
 .env
 .pytest_cache/
 tests/
