@@ -5,13 +5,11 @@ beautifulsoup4
 sqlalchemy
 python-dotenv
 google-generativeai
-passlib[bcrypt]
 python-jose[cryptography]
 slowapi
 python-multipart
 midtransclient
 psycopg2-binary
-bcrypt
 passlib
 google-auth
 google-auth-oauthlib
