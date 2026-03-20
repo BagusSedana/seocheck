@@ -12,3 +12,4 @@ python-multipart
 midtransclient
 psycopg2-binary
 certifi
+email-validator
