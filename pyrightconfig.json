@@ -1,0 +1,9 @@
+{
+   "pythonVersion": "3.11",
+   "pythonPlatform": "Windows",
+   "include": ["."],
+   "extraPaths": ["."],
+   "typeCheckingMode": "basic",
+   "reportMissingImports": "warning",
+   "reportMissingModuleSource": "none"
+}

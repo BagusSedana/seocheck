@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.db
+*.log
+*.txt
+.env
+.pytest_cache/
+tests/
+test_*.py
+check_metadata.py
+debug_migration.py
+encode_pass.py
+test_cert.py
+test_conn.py
