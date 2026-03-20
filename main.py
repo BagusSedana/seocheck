@@ -42,6 +42,14 @@ from scanner.free_tools import router as free_tools_router
 
 models.Base.metadata.create_all(bind=engine)
 
+# Proactive Migration: Add has_white_label if missing (PostgreSQL)
+from sqlalchemy import text
+with engine.begin() as conn:
+    try:
+        conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS has_white_label BOOLEAN DEFAULT FALSE"))
+    except Exception as e:
+        print(f"Migration Note (users.has_white_label): {e}")
+
 limiter = Limiter(key_func=get_remote_address)
 app = FastAPI(title="SEO Scanner API — Bang Bisnis", version="2.0.0")
 app.state.limiter = limiter
