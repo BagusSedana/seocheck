@@ -107,6 +107,13 @@ class LeadSchema(BaseModel):
     domain:   str
     scan_id:  Optional[int] = None
 
+class ContactRequest(BaseModel):
+    name: str
+    email: EmailStr
+    subject: str
+    category: Optional[str] = None
+    message: str
+
 class UpdateProfileSchema(BaseModel):
     name: Optional[str] = None
     whatsapp: Optional[str] = None
@@ -535,6 +542,26 @@ async def get_leads(
         "domain":     l.domain,
         "created_at": l.created_at
     } for l in leads]
+
+@app.post("/contact", tags=["Marketing"])
+@limiter.limit("5/minute")
+async def submit_contact(request: Request, body: ContactRequest, db: Session = Depends(get_db)) -> Any:
+    new_message = models.ContactMessage(
+        name=body.name,
+        email=body.email,
+        subject=body.subject,
+        category=body.category,
+        message=body.message
+    )
+    db.add(new_message)
+    db.commit()
+    db.refresh(new_message)
+    import random
+    ticket_id = str(random.randint(10000, 99999))
+    return {
+        "message": "Pesan berhasil dikirim.",
+        "ticket_id": ticket_id
+    }
 
 # ══════════════════════════════════════════
 # PROJECTS

@@ -115,3 +115,14 @@ class LeadCapture(Base):
     scan_id    = Column(Integer, ForeignKey("scan_results.id"), nullable=True)
     source     = Column(String(50), default="free_scan")
     created_at = Column(DateTime, default=func.now())
+
+class ContactMessage(Base):
+    __tablename__ = "contact_messages"
+    id         = Column(Integer, primary_key=True, index=True)
+    name       = Column(String(255), nullable=False)
+    email      = Column(String(255), nullable=False)
+    subject    = Column(String(255), nullable=False)
+    category   = Column(String(100), nullable=True)
+    message    = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=func.now())
+
