@@ -40,7 +40,7 @@ async def safe_fetch(url: str) -> httpx.Response:
 @router.post("/title-tag")
 async def check_title_tag(req: ToolRequest):
     resp = await safe_fetch(req.url)
-    soup = BeautifulSoup(resp.text, "lxml")
+    soup = BeautifulSoup(resp.text, "html.parser")
     title_tag = soup.find("title")
     title = title_tag.get_text().strip() if title_tag else None
     
@@ -54,7 +54,7 @@ async def check_title_tag(req: ToolRequest):
 @router.post("/meta-description")
 async def check_meta_desc(req: ToolRequest):
     resp = await safe_fetch(req.url)
-    soup = BeautifulSoup(resp.text, "lxml")
+    soup = BeautifulSoup(resp.text, "html.parser")
     desc = None
     for meta in soup.find_all("meta"):
         if str(meta.get("name") or "").lower() == "description":
@@ -71,7 +71,7 @@ async def check_meta_desc(req: ToolRequest):
 @router.post("/h1-extractor")
 async def extract_h1(req: ToolRequest):
     resp = await safe_fetch(req.url)
-    soup = BeautifulSoup(resp.text, "lxml")
+    soup = BeautifulSoup(resp.text, "html.parser")
     h1s = [h.get_text().strip() for h in soup.find_all("h1")]
     
     return {
@@ -138,7 +138,7 @@ async def handle_dynamic_tool(slug: str, req: ToolRequest):
 
     try:
         resp = await safe_fetch(req.url)
-        soup = BeautifulSoup(resp.text, "lxml")
+        soup = BeautifulSoup(resp.text, "html.parser")
         
         if slug == "keyword-density-analyzer":
             text = soup.get_text(separator=' ').lower()

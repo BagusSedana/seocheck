@@ -1125,20 +1125,24 @@ async def create_payment(
 ) -> Any:
     try:
         # 1. Validation
-        if body.plan_tier not in ["pro", "agency", "topup_20", "topup_50"]:
+        valid_plans = ["pro", "agency", "topup_20", "topup_50", "addon-5", "addon-wl"]
+        if body.plan_tier not in valid_plans:
             raise HTTPException(400, "Plan tidak valid")
         if body.billing_cycle not in ["monthly", "yearly"]:
-            raise HTTPException(400, "Siklus billing tidak valid")
+            if not body.plan_tier.startswith("topup_") and not body.plan_tier.startswith("addon-"):
+                raise HTTPException(400, "Siklus billing tidak valid")
 
         # 2. Determine Price
         prices = {
             "pro":       {"monthly": 89000,  "yearly": 890000},
             "agency":    {"monthly": 229000, "yearly": 2290000},
-            "topup_20":  {"monthly": 15000,  "yearly": 15000},  # reuse monthly key
-            "topup_50":  {"monthly": 30000,  "yearly": 30000}
+            "topup_20":  {"monthly": 15000,  "yearly": 15000},
+            "topup_50":  {"monthly": 30000,  "yearly": 30000},
+            "addon-5":   {"monthly": 25000,  "yearly": 25000},
+            "addon-wl":  {"monthly": 150000, "yearly": 1500000}
         }
         
-        if body.plan_tier.startswith("topup_"):
+        if body.plan_tier.startswith("topup_") or body.plan_tier.startswith("addon-"):
             amount = prices[body.plan_tier]["monthly"]
         else:
             amount = prices[body.plan_tier][body.billing_cycle]
@@ -1164,9 +1168,14 @@ async def create_payment(
         }
         
         item_name = f"SEO Scanner {body.plan_tier.capitalize()}"
-        if body.plan_tier.startswith("topup_"):
-            scans = body.plan_tier.split("_")[1]
-            item_name = f"Top-up {scans} Scans"
+        if body.plan_tier.startswith("topup_") or body.plan_tier.startswith("addon-"):
+            if body.plan_tier == "addon-5":
+                item_name = "Top-up 5 Scans"
+            elif body.plan_tier == "addon-wl":
+                item_name = "White-Label Report Add-on"
+            else:
+                scans = body.plan_tier.split("_")[1]
+                item_name = f"Top-up {scans} Scans"
         else:
             item_name += f" ({body.billing_cycle})"
 
@@ -1231,8 +1240,12 @@ def handle_transaction_status(db: Session, status_response: dict):
     if tx.status == "settlement":
         user = db.query(models.User).filter(models.User.id == tx.user_id).first()
         if user:
-            # Handle Top-up
-            if tx.plan_tier.startswith("topup_"):
+            # Handle Top-up & Add-ons
+            if tx.plan_tier == "addon-5":
+                user.topup_scans += 5
+            elif tx.plan_tier == "addon-wl":
+                user.has_white_label = True
+            elif tx.plan_tier.startswith("topup_"):
                 scans = int(tx.plan_tier.split("_")[1])
                 user.topup_scans += scans
             else:

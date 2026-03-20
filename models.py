@@ -20,6 +20,7 @@ class User(Base):
     topup_scans      = Column(Integer, default=0)
     last_reset_date  = Column(DateTime, default=func.now())
     subscription_end = Column(DateTime, nullable=True)
+    has_white_label  = Column(Boolean, default=False)
     
     created_at       = Column(DateTime, default=func.now())
     updated_at       = Column(DateTime, default=func.now(), onupdate=func.now())

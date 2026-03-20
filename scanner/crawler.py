@@ -155,7 +155,7 @@ async def crawl(url: str) -> Dict[str, Any]:
                 if h in response.headers:
                     result["security_headers"][h] = response.headers[h]
 
-            soup = BeautifulSoup(response.text, "lxml")
+            soup = BeautifulSoup(response.text, "html.parser")
             parsed  = urlparse(url)
             domain  = parsed.netloc
             base_domain = domain.replace("www.", "")
